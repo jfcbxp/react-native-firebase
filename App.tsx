@@ -11,11 +11,13 @@ import {
   View,
 } from "react-native";
 import Listagem from "./src/components/Listagem";
-import { realtime } from "./src/services/firebaseConnection";
+import { realtime, firebaseAuth } from "./src/services/firebaseConnection";
 
 export default function App() {
   const [nome, setNome] = useState("Carregando");
   const [usuarios, setUsuarios] = useState<any>([]);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const renderItem: ListRenderItem<any> = ({ item }) => (
     <Listagem data={item} />
   );
@@ -42,14 +44,27 @@ export default function App() {
   }, []);
 
   const cadastrar = () => {
+    firebaseAuth
+      .createUserWithEmailAndPassword(email, senha)
+      .then((result) => {
+        alert(result.user?.uid);
+      })
+      .catch((error) => {
+        if (error.code === "auth/weak-password") {
+          alert("teste");
+        }
+        if (error.code === "auth/invalid-email") {
+          alert("teste");
+        }
+      });
+  };
+
+  const teste = () => {
     //realtime.ref("usuarios").push().key;
     realtime.ref("usuarios").child("1").set({
       nome: nome,
       cargo: "teste2",
     });
-  };
-
-  const teste = () => {
     realtime
       .ref("tipo")
       .set("Cliente")
@@ -70,12 +85,23 @@ export default function App() {
         underlineColorAndroid="transparent"
         onChangeText={(texto) => setNome(texto)}
       />
-      <Button title="Novo funcionario" onPress={cadastrar} />
+      <Button title="Teste" onPress={teste} />
       <FlatList
         keyExtractor={keyItem}
         data={usuarios}
         renderItem={renderItem}
       />
+      <TextInput
+        style={styles.input}
+        underlineColorAndroid="transparent"
+        onChangeText={(email) => setEmail(email)}
+      />
+      <TextInput
+        style={styles.input}
+        underlineColorAndroid="transparent"
+        onChangeText={(senha) => setSenha(senha)}
+      />
+      <Button title="Cadastrar" onPress={cadastrar} />
       <StatusBar style="auto" />
     </SafeAreaView>
   );
