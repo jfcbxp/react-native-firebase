@@ -59,6 +59,26 @@ export default function App() {
       });
   };
 
+  const logar = () => {
+    firebaseAuth
+      .signInWithEmailAndPassword(email, senha)
+      .then((result) => {
+        alert(result.user?.uid);
+      })
+      .catch((error) => {
+        if (error.code === "auth/weak-password") {
+          alert("teste");
+        }
+        if (error.code === "auth/invalid-email") {
+          alert("teste");
+        }
+      });
+  };
+
+  const logout = () => {
+    firebaseAuth.signOut();
+  };
+
   const teste = () => {
     //realtime.ref("usuarios").push().key;
     realtime.ref("usuarios").child("1").set({
